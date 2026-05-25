@@ -11,10 +11,17 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#faf7f2;height:100dvh;display:flex;flex-direction:column}
 header{background:#5B3E2E;color:#fff;padding:14px 18px;text-align:center;font-size:17px;font-weight:600;letter-spacing:0.5px}
 #chat{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
-.bubble{max-width:85%;padding:12px 15px;border-radius:16px;font-size:15px;line-height:1.6;word-break:break-word;animation:fadeIn .25s}
-.bubble.user{align-self:flex-end;background:#5B3E2E;color:#fff;border-bottom-right-radius:4px}
-.bubble.agent{align-self:flex-start;background:#fff;color:#333;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.bubble.loading{background:#fff;color:#999;font-style:italic}
+.bubble-row{display:flex;align-items:flex-end;gap:6px;max-width:85%;animation:fadeIn .25s}
+.bubble-row.user{align-self:flex-end;flex-direction:row-reverse}
+.bubble-row.agent{align-self:flex-start}
+.bubble-row .avatar{font-size:22px;flex-shrink:0}
+.bubble-row .text{padding:12px 15px;border-radius:16px;font-size:15px;line-height:1.6;word-break:break-word}
+.bubble-row.user .text{background:#5B3E2E;color:#fff;border-bottom-right-radius:4px}
+.bubble-row.agent .text{background:#fff;color:#333;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.bubble-row.loading .text{background:#fff;color:#999;font-style:italic}
+.quick-replies{display:flex;flex-wrap:wrap;gap:8px;padding:6px 12px 10px}
+.quick-replies button{background:#fff;border:1.5px solid #e0d6cc;border-radius:18px;padding:7px 13px;font-size:13px;cursor:pointer;white-space:nowrap}
+.quick-replies button:active{background:#5B3E2E;color:#fff;border-color:#5B3E2E}
 #input-bar{display:flex;padding:10px 12px 14px;gap:8px;background:#fff;border-top:1px solid #eee}
 #input-bar input{flex:1;padding:11px 14px;border:1.5px solid #e0d6cc;border-radius:22px;font-size:15px;outline:none;background:#faf7f2}
 #input-bar input:focus{border-color:#5B3E2E}
@@ -25,6 +32,12 @@ header{background:#5B3E2E;color:#fff;padding:14px 18px;text-align:center;font-si
 <body>
 <header>☕ 饮品推荐助手</header>
 <div id="chat"></div>
+<div class="quick-replies" id="quick-replies">
+  <button onclick="quickSend('🧊 推荐一杯冰咖啡')">🧊 冰咖啡</button>
+  <button onclick="quickSend('☕ 想喝热的拿铁')">☕ 热拿铁</button>
+  <button onclick="quickSend('🍵 来杯清爽的果茶')">🍵 清爽果茶</button>
+  <button onclick="quickSend('🥤 奶茶推荐一下')">🥤 奶茶</button>
+</div>
 <div id="input-bar">
   <input id="msg" type="text" placeholder="说说你想喝什么..." autocomplete="off">
   <button onclick="send()">发送</button>
@@ -33,21 +46,24 @@ header{background:#5B3E2E;color:#fff;padding:14px 18px;text-align:center;font-si
 const chat = document.getElementById('chat');
 const input = document.getElementById('msg');
 const USER_ID = 'user_' + Math.random().toString(36).slice(2, 8);
+const AGENT_FACES = ['☺️','😊','🥰','😋','💕','🌸','🐣','🧋','🍃','✨'];
 
 function addBubble(text, role) {
-  const div = document.createElement('div');
-  div.className = 'bubble ' + role;
-  div.textContent = text;
-  chat.appendChild(div);
+  const row = document.createElement('div');
+  row.className = 'bubble-row ' + role;
+  const face = role === 'user' ? '😎' : AGENT_FACES[Math.floor(Math.random() * AGENT_FACES.length)];
+  row.innerHTML = '<span class="avatar">' + face + '</span><span class="text"></span>';
+  row.querySelector('.text').textContent = text;
+  chat.appendChild(row);
   chat.scrollTop = chat.scrollHeight;
 }
 
 function addLoading() {
-  const div = document.createElement('div');
-  div.className = 'bubble agent loading';
-  div.textContent = '正在为您挑选...';
-  div.id = 'loading';
-  chat.appendChild(div);
+  const row = document.createElement('div');
+  row.className = 'bubble-row agent loading';
+  row.id = 'loading';
+  row.innerHTML = '<span class="avatar">🤔</span><span class="text">正在为您挑选...</span>';
+  chat.appendChild(row);
   chat.scrollTop = chat.scrollHeight;
 }
 
@@ -56,8 +72,8 @@ function removeLoading() {
   if (el) el.remove();
 }
 
-async function send() {
-  const msg = input.value.trim();
+async function send(msg) {
+  if (!msg) msg = input.value.trim();
   if (!msg) return;
   input.value = '';
   addBubble(msg, 'user');
@@ -76,6 +92,8 @@ async function send() {
     addBubble('网络出错了，请稍后再试 🥺', 'agent');
   }
 }
+
+function quickSend(msg) { send(msg); }
 
 input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
 
