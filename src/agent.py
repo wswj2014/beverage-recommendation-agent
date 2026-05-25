@@ -160,6 +160,9 @@ class BeverageRecommendAgent:
                     max_tokens=512,
                 )
 
+        if not final_answer or not final_answer.strip():
+            final_answer = "抱歉呀，刚刚走神了～能再说一遍吗？☺️"
+
         self.dialogue.append("User", user_input)
         self.dialogue.append("Agent", final_answer)
         return final_answer
