@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#5B3E2E">
+<link rel="manifest" href="/static/manifest.json">
+<title>饮品推荐助手</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#faf7f2;height:100dvh;display:flex;flex-direction:column}
+header{background:#5B3E2E;color:#fff;padding:14px 18px;text-align:center;font-size:17px;font-weight:600;letter-spacing:0.5px}
+#chat{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
+.bubble{max-width:85%;padding:12px 15px;border-radius:16px;font-size:15px;line-height:1.6;word-break:break-word;animation:fadeIn .25s}
+.bubble.user{align-self:flex-end;background:#5B3E2E;color:#fff;border-bottom-right-radius:4px}
+.bubble.agent{align-self:flex-start;background:#fff;color:#333;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.bubble.loading{background:#fff;color:#999;font-style:italic}
+#input-bar{display:flex;padding:10px 12px 14px;gap:8px;background:#fff;border-top:1px solid #eee}
+#input-bar input{flex:1;padding:11px 14px;border:1.5px solid #e0d6cc;border-radius:22px;font-size:15px;outline:none;background:#faf7f2}
+#input-bar input:focus{border-color:#5B3E2E}
+#input-bar button{background:#5B3E2E;color:#fff;border:none;border-radius:22px;padding:11px 20px;font-size:15px;font-weight:500;cursor:pointer}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<header>☕ 饮品推荐助手</header>
+<div id="chat"></div>
+<div id="input-bar">
+  <input id="msg" type="text" placeholder="说说你想喝什么..." autocomplete="off">
+  <button onclick="send()">发送</button>
+</div>
+<script>
+const chat = document.getElementById('chat');
+const input = document.getElementById('msg');
+const USER_ID = 'user_' + Math.random().toString(36).slice(2, 8);
+
+function addBubble(text, role) {
+  const div = document.createElement('div');
+  div.className = 'bubble ' + role;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addLoading() {
+  const div = document.createElement('div');
+  div.className = 'bubble agent loading';
+  div.textContent = '正在为您挑选...';
+  div.id = 'loading';
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeLoading() {
+  const el = document.getElementById('loading');
+  if (el) el.remove();
+}
+
+async function send() {
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addBubble(msg, 'user');
+  addLoading();
+  try {
+    const resp = await fetch('/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({user_id: USER_ID, message: msg}),
+    });
+    const data = await resp.json();
+    removeLoading();
+    addBubble(data.reply, 'agent');
+  } catch(e) {
+    removeLoading();
+    addBubble('网络出错了，请稍后再试 🥺', 'agent');
+  }
+}
+
+input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js');
+}
+</script>
+</body>
+</html>

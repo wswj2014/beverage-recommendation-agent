@@ -2,6 +2,8 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from src.agent import BeverageRecommendAgent
 
@@ -17,6 +19,17 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
+
+
+@app.on_event("startup")
+def startup():
+    from data.init_db import init_db
+    init_db()
+
+
+@app.get("/")
+def index():
+    return FileResponse("static/index.html")
 
 
 @app.get("/health")
@@ -40,3 +53,6 @@ def clear_chat(user_id: str):
     if agent:
         agent.clear()
     return {"status": "cleared"}
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
