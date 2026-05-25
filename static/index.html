@@ -83,11 +83,11 @@ try { chatHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } cat
 
 function saveHistory() { localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory)); }
 
-function addBubble(text, role, save) {
-  if (save !== false) { chatHistory.push({text, role}); saveHistory(); }
+function addBubble(text, role, save, savedFace) {
+  var face = savedFace || (role === 'user' ? '😎' : AGENT_FACES[Math.floor(Math.random() * AGENT_FACES.length)]);
+  if (save !== false) { chatHistory.push({text, role, face}); saveHistory(); }
   const row = document.createElement('div');
   row.className = 'bubble-row ' + role;
-  const face = role === 'user' ? '😎' : AGENT_FACES[Math.floor(Math.random() * AGENT_FACES.length)];
   row.innerHTML = '<span class="avatar">' + face + '</span><span class="text"></span>';
   row.querySelector('.text').textContent = text;
   chat.appendChild(row);
@@ -95,7 +95,7 @@ function addBubble(text, role, save) {
 }
 
 // 恢复历史消息
-chatHistory.forEach(m => addBubble(m.text, m.role, false));
+chatHistory.forEach(function(m) { addBubble(m.text, m.role, false, m.face); });
 
 function addLoading() {
   const row = document.createElement('div');
