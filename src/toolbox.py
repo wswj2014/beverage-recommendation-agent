@@ -1,4 +1,5 @@
 import json
+import re
 from ast import literal_eval
 from typing import Dict
 
@@ -11,31 +12,48 @@ class ToolBox:
         self.buffer = buffer
         self.name = "ToolExecutor"
         self.desc = (
-            "Execute a plan of tool calls. Input is a JSON array of tool calls: "
-            '[{"tool_name": "ToolName", "input": {...}}, ...]. '
+            "Execute a plan of tool calls. Input is a JSON array: "
+            '[{"tool_name": "Filter", "input": {"category": "咖啡"}}, {"tool_name": "Format", "input": {"top_k": 5}}]. '
             "Only LookUp and Format return visible output."
         )
 
-    def run(self, plan_json: str) -> str:
+    def _try_parse(self, text: str):
+        # Try direct JSON parse
         try:
-            plans = json.loads(plan_json)
+            return True, json.loads(text)
         except Exception:
+            pass
+
+        # Try to extract JSON array from text
+        match = re.search(r'\[[\s\S]*\]', text)
+        if match:
             try:
-                plans = literal_eval(plan_json)
+                return True, json.loads(match.group())
             except Exception:
-                return "工具计划解析失败。请使用正确的 JSON 格式。"
+                pass
+
+        # Try Python literal eval
+        try:
+            return True, literal_eval(text)
+        except Exception:
+            pass
+
+        return False, f"无法解析工具计划: {text[:200]}"
+
+    def run(self, plan_json: str) -> str:
+        ok, plans = self._try_parse(plan_json)
+        if not ok:
+            return str(plans)
 
         if isinstance(plans, dict):
             plans = [plans]
 
         plans = {p["tool_name"]: p["input"] for p in plans}
 
-        # 检查工具名是否存在
         for name in plans:
             if name not in self.tools:
                 return f"工具 '{name}' 不存在。可用工具: {list(self.tools.keys())}"
 
-        # 确保 Format 在最后
         if "Format" in plans:
             format_input = plans.pop("Format")
             plans["Format"] = format_input

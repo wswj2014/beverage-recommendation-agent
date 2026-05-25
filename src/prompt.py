@@ -39,7 +39,7 @@ If tools ARE needed, make a plan and use ToolExecutor:
 Question: Do I need to use tools?
 Thought: Yes, I need to make a plan first.
 Action: ToolExecutor
-Action Input: a JSON array like [{{"tool_name": "{FilterTool}", "input": {{"category": "value", "temperature": "value"}}}}, {{"tool_name": "{RankTool}", "input": {{"order_by": "popularity", "limit": 5}}}}, {{"tool_name": "{FormatTool}", "input": {{"top_k": 5}}}}]
+Action Input: [{{"tool_name": "{FilterTool}", "input": {{"category": "咖啡", "temperature": "冰"}}}}, {{"tool_name": "{RankTool}", "input": {{"order_by": "popularity", "limit": 5}}}}, {{"tool_name": "{FormatTool}", "input": {{"top_k": 5}}}}]
 ###
 
 Tool names: {tool_names}
