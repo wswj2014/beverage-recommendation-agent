@@ -56,7 +56,7 @@ header .clear-btn{position:absolute;right:14px;background:rgba(255,255,255,.2);b
 <header>☕ 蜜雪宣城<button class="clear-btn" onclick="clearChat()" title="清空记录">↺</button></header>
 <div id="chat">
   <div class="quick-replies" id="quick-replies">
-    <button onclick="quickSend('🧊 推荐一杯冰咖啡')">🧊 冰美式</button>
+    <button onclick="quickSend('🧊 来一杯冰美式')">🧊 冰美式</button>
     <button onclick="quickSend('☕ 想喝热的拿铁')">☕ 热拿铁</button>
     <button onclick="quickSend('🍵 来杯清爽的果茶')">🍵 清爽果茶</button>
     <button onclick="quickSend('🥤 奶茶推荐一下')">🥤 奶茶</button>
@@ -119,7 +119,7 @@ function clearChat() {
   var qr = document.createElement('div');
   qr.className = 'quick-replies';
   qr.id = 'quick-replies';
-  qr.innerHTML = '<button onclick="quickSend(\'🧊 推荐一杯冰咖啡\')">🧊 冰美式</button><button onclick="quickSend(\'☕ 想喝热的拿铁\')">☕ 热拿铁</button><button onclick="quickSend(\'🍵 来杯清爽的果茶\')">🍵 清爽果茶</button><button onclick="quickSend(\'🥤 奶茶推荐一下\')">🥤 奶茶</button><button onclick="quickSend(\'🍧 来一杯冰沙\')">🍧 沙冰</button><button onclick="quickSend(\'🥬 想喝果蔬茶\')">🥬 果蔬茶</button>';
+  qr.innerHTML = '<button onclick="quickSend(\'🧊 来一杯冰美式\')">🧊 冰美式</button><button onclick="quickSend(\'☕ 想喝热的拿铁\')">☕ 热拿铁</button><button onclick="quickSend(\'🍵 来杯清爽的果茶\')">🍵 清爽果茶</button><button onclick="quickSend(\'🥤 奶茶推荐一下\')">🥤 奶茶</button><button onclick="quickSend(\'🍧 来一杯冰沙\')">🍧 沙冰</button><button onclick="quickSend(\'🥬 想喝果蔬茶\')">🥬 果蔬茶</button>';
   chat.appendChild(qr);
   fetch('/chat/' + USER_ID + '/clear', {method:'POST'}).catch(function(){});
 }
