@@ -39,12 +39,35 @@ def health():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    agent = agents.get(req.user_id)
-    if agent is None:
-        agent = BeverageRecommendAgent()
-        agents[req.user_id] = agent
-    reply = agent.run(req.message)
-    return ChatResponse(reply=reply)
+    try:
+        agent = agents.get(req.user_id)
+        if agent is None:
+            agent = BeverageRecommendAgent()
+            agents[req.user_id] = agent
+        reply = agent.run(req.message)
+        return ChatResponse(reply=reply)
+    except Exception as e:
+        return ChatResponse(reply=f"错误: {type(e).__name__}: {e}")
+
+
+@app.get("/debug")
+def debug():
+    from config import DB_PATH, DEEPSEEK_MODEL
+    import sqlite3
+    db_exists = os.path.exists(DB_PATH)
+    db_size = os.path.getsize(DB_PATH) if db_exists else 0
+    conn = sqlite3.connect(DB_PATH)
+    count = conn.execute("SELECT COUNT(*) FROM beverages").fetchone()[0]
+    conn.close()
+    return {
+        "db_path": DB_PATH,
+        "db_exists": db_exists,
+        "db_size": db_size,
+        "beverage_count": count,
+        "model": DEEPSEEK_MODEL,
+        "api_key_set": bool(os.getenv("DEEPSEEK_API_KEY")),
+        "pythonpath": os.getcwd(),
+    }
 
 
 @app.post("/chat/{user_id}/clear")
