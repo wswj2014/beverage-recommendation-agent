@@ -33,8 +33,8 @@ class FilterTool:
             where.append("name LIKE ?")
             params.append(f"%{conditions['name']}%")
         if "category" in conditions:
-            where.append("category = ?")
-            params.append(conditions["category"])
+            where.append("category LIKE ?")
+            params.append(f"%{conditions['category']}%")
         if "temperature" in conditions:
             temp = conditions["temperature"]
             where.append("(temperature = ? OR temperature LIKE ?)")
