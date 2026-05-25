@@ -141,7 +141,9 @@ async function send(msg) {
     addBubble(data.reply, 'agent');
   } catch(e) {
     removeLoading();
-    addBubble('网络出错了，请稍后再试 🥺', 'agent');
+    if (e.name !== 'AbortError' && e.message.indexOf('abort') === -1) {
+      addBubble('网络出错了，请稍后再试 🥺', 'agent');
+    }
   }
 }
 
