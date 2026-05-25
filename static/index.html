@@ -11,7 +11,13 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#e8f5e9 0%,#e3f2ef 30%,#f1f8e9 60%,#e0f2f1 100%);height:100dvh;display:flex;flex-direction:column}
 body::before{content:'';position:fixed;bottom:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(129,199,132,.10);pointer-events:none}
 body::after{content:'';position:fixed;top:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:rgba(77,182,172,.08);pointer-events:none}
-.snow-bg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);opacity:.06;pointer-events:none;z-index:0;width:260px;height:260px}
+.fruit{position:fixed;pointer-events:none;z-index:0;opacity:.07}
+.fruit-1{top:8%;right:5%;width:90px;height:90px}
+.fruit-2{bottom:12%;left:3%;width:100px;height:100px}
+.fruit-3{top:45%;right:2%;width:80px;height:80px}
+.fruit-4{bottom:25%;right:8%;width:70px;height:70px}
+.fruit-5{top:15%;left:4%;width:75px;height:75px}
+.fruit-6{bottom:40%;left:6%;width:85px;height:85px}
 header{background:linear-gradient(135deg,#66bb6a,#4db6ac);color:#fff;padding:14px 18px;text-align:center;font-size:17px;font-weight:600;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(76,175,80,.15)}
 #chat{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
 .bubble-row{display:flex;align-items:flex-end;gap:6px;max-width:85%;animation:fadeIn .25s;position:relative;z-index:1}
@@ -34,21 +40,18 @@ header{background:linear-gradient(135deg,#66bb6a,#4db6ac);color:#fff;padding:14p
 </style>
 </head>
 <body>
-<svg class="snow-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="100" cy="145" r="35" fill="#e0e0e0"/>
-  <circle cx="100" cy="117" r="28" fill="#eee"/>
-  <circle cx="100" cy="94" r="22" fill="#f5f5f5"/>
-  <circle cx="93" cy="88" r="2.5" fill="#333"/>
-  <circle cx="107" cy="88" r="2.5" fill="#333"/>
-  <ellipse cx="100" cy="97" rx="3" ry="2" fill="#ff8a80"/>
-  <path d="M90 82 Q95 74 100 75 Q105 74 110 82 L108 70 L105 64 L100 68 L95 64 L92 70 Z" fill="#ffb300"/>
-  <rect x="97" y="54" width="6" height="12" rx="3" fill="#ffb300"/>
-  <circle cx="100" cy="52" r="4" fill="#ffb300"/>
-  <path d="M78 120 Q68 110 72 100" stroke="#e0e0e0" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M122 120 Q132 110 128 100" stroke="#e0e0e0" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <rect x="76" y="138" width="48" height="6" rx="3" fill="#ffb300"/>
-  <rect x="74" y="146" width="4" height="10" rx="2" fill="#ffb300"/>
-</svg>
+<!-- 西瓜 -->
+<svg class="fruit fruit-1" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="#4caf50"/><circle cx="50" cy="50" r="34" fill="#ef5350"/><circle cx="40" cy="40" r="3" fill="#333"/><circle cx="55" cy="35" r="2.5" fill="#333"/><circle cx="45" cy="50" r="3" fill="#333"/><circle cx="58" cy="52" r="2" fill="#333"/></svg>
+<!-- 哈密瓜 -->
+<svg class="fruit fruit-2" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="40" ry="32" fill="#ffb74d"/><ellipse cx="50" cy="48" rx="30" ry="20" fill="#ffe0b2"/><circle cx="42" cy="44" r="2.5" fill="#e65100"/><circle cx="55" cy="40" r="2" fill="#e65100"/><circle cx="48" cy="52" r="2" fill="#e65100"/></svg>
+<!-- 桃子 -->
+<svg class="fruit fruit-3" viewBox="0 0 100 100"><circle cx="50" cy="52" r="36" fill="#ffab91"/><circle cx="38" cy="48" r="18" fill="#ffccbc"/><path d="M50 16 Q55 8 60 10 Q58 20 50 22Z" fill="#8d6e63"/><ellipse cx="50" cy="52" rx="2" ry="6" fill="#e65100"/></svg>
+<!-- 橙子 -->
+<svg class="fruit fruit-4" viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="#ff9800"/><circle cx="40" cy="45" r="6" fill="#ffb74d" opacity=".5"/><circle cx="48" cy="42" r="2" fill="#e65100"/><circle cx="55" cy="48" r="1.5" fill="#e65100"/></svg>
+<!-- 柠檬 -->
+<svg class="fruit fruit-5" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="32" ry="38" fill="#ffee58"/><ellipse cx="50" cy="50" rx="26" ry="32" fill="#fff9c4"/><path d="M48 26 Q50 18 52 26" stroke="#827717" stroke-width="2" fill="none"/></svg>
+<!-- 草莓 -->
+<svg class="fruit fruit-6" viewBox="0 0 100 100"><path d="M50 85 Q20 60 30 30 Q40 15 50 20 Q60 15 70 30 Q80 60 50 85Z" fill="#e53935"/><circle cx="40" cy="38" r="2" fill="#ffcdd2"/><circle cx="52" cy="45" r="2" fill="#ffcdd2"/><circle cx="44" cy="55" r="2" fill="#ffcdd2"/><path d="M47 20 Q50 6 53 20" fill="#4caf50"/><path d="M44 22 Q50 12 56 22Z" fill="#66bb6a"/></svg>
 <header>☕ 蜜雪宣城</header>
 <div id="chat"></div>
 <div class="quick-replies" id="quick-replies">
