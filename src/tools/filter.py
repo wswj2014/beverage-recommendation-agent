@@ -10,8 +10,8 @@ from src.buffer import CandidateBuffer
 class FilterTool:
     name = "Filter"
     desc = (
-        "按条件筛选饮品。可选条件: category(品类), temperature(温度), sweetness(甜度), "
-        "price_min, price_max, tags(标签关键词)。输入为 JSON 对象。"
+        "按条件筛选饮品。可选条件: name(饮品名模糊), category(品类), temperature(温度), "
+        "sweetness(甜度), price_min, price_max, tags(标签关键词)。输入为 JSON 对象。"
     )
 
     def __init__(self, buffer: CandidateBuffer):
@@ -29,6 +29,9 @@ class FilterTool:
         where = []
         params = []
 
+        if "name" in conditions:
+            where.append("name LIKE ?")
+            params.append(f"%{conditions['name']}%")
         if "category" in conditions:
             where.append("category = ?")
             params.append(conditions["category"])
