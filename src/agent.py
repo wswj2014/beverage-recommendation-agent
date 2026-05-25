@@ -135,8 +135,10 @@ class BeverageRecommendAgent:
             **self._tool_name_map,
         )
 
-        # LLM 第 1 次调用：决策（规划工具 or 直接回复）
+        # LLM 第 1 次调用：决策（规划工具 or 直接回复），空回复重试1次
         llm_output = self.llm.call(user_prompt=prompt, max_tokens=512)
+        if not llm_output or not llm_output.strip():
+            llm_output = self.llm.call(user_prompt=prompt, max_tokens=512)
         is_final, content = self._parse_llm_output(llm_output)
 
         if is_final:
