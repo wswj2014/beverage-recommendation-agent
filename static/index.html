@@ -18,7 +18,8 @@ body::after{content:'';position:fixed;top:-40px;left:-40px;width:160px;height:16
 .fruit-4{bottom:25%;right:8%;width:70px;height:70px}
 .fruit-5{top:15%;left:4%;width:75px;height:75px}
 .fruit-6{bottom:40%;left:6%;width:85px;height:85px}
-header{background:linear-gradient(135deg,#66bb6a,#4db6ac);color:#fff;padding:14px 18px;text-align:center;font-size:17px;font-weight:600;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(76,175,80,.15)}
+header{background:linear-gradient(135deg,#66bb6a,#4db6ac);color:#fff;padding:14px 18px;text-align:center;font-size:17px;font-weight:600;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(76,175,80,.15);display:flex;align-items:center;justify-content:center;gap:10px}
+header .clear-btn{position:absolute;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:20px;width:30px;height:30px;border-radius:50%;cursor:pointer;line-height:1}
 #chat{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
 .bubble-row{display:flex;align-items:flex-end;gap:6px;max-width:85%;animation:fadeIn .25s;position:relative;z-index:1}
 .bubble-row.user{align-self:flex-end;flex-direction:row-reverse}
@@ -52,7 +53,7 @@ header{background:linear-gradient(135deg,#66bb6a,#4db6ac);color:#fff;padding:14p
 <svg class="fruit fruit-5" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="32" ry="38" fill="#ffee58"/><ellipse cx="50" cy="50" rx="26" ry="32" fill="#fff9c4"/><path d="M48 26 Q50 18 52 26" stroke="#827717" stroke-width="2" fill="none"/></svg>
 <!-- 草莓 -->
 <svg class="fruit fruit-6" viewBox="0 0 100 100"><path d="M50 85 Q20 60 30 30 Q40 15 50 20 Q60 15 70 30 Q80 60 50 85Z" fill="#e53935"/><circle cx="40" cy="38" r="2" fill="#ffcdd2"/><circle cx="52" cy="45" r="2" fill="#ffcdd2"/><circle cx="44" cy="55" r="2" fill="#ffcdd2"/><path d="M47 20 Q50 6 53 20" fill="#4caf50"/><path d="M44 22 Q50 12 56 22Z" fill="#66bb6a"/></svg>
-<header>☕ 蜜雪宣城</header>
+<header>☕ 蜜雪宣城<button class="clear-btn" onclick="clearChat()" title="清空记录">↺</button></header>
 <div id="chat"></div>
 <div class="quick-replies" id="quick-replies">
   <button onclick="quickSend('🧊 推荐一杯冰咖啡')">🧊 冰美式</button>
@@ -69,10 +70,20 @@ header{background:linear-gradient(135deg,#66bb6a,#4db6ac);color:#fff;padding:14p
 <script>
 const chat = document.getElementById('chat');
 const input = document.getElementById('msg');
-const USER_ID = 'user_' + Math.random().toString(36).slice(2, 8);
 const AGENT_FACES = ['☺️','😊','🥰','😋','💕','🌸','🐣','🧋','🍃','✨'];
+const STORAGE_KEY = 'mx_chat_history';
+const UID_KEY = 'mx_user_id';
 
-function addBubble(text, role) {
+let USER_ID = localStorage.getItem(UID_KEY);
+if (!USER_ID) { USER_ID = 'u_' + Math.random().toString(36).slice(2, 8); localStorage.setItem(UID_KEY, USER_ID); }
+
+let chatHistory = [];
+try { chatHistory = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
+
+function saveHistory() { localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory)); }
+
+function addBubble(text, role, save) {
+  if (save !== false) { chatHistory.push({text, role}); saveHistory(); }
   const row = document.createElement('div');
   row.className = 'bubble-row ' + role;
   const face = role === 'user' ? '😎' : AGENT_FACES[Math.floor(Math.random() * AGENT_FACES.length)];
@@ -81,6 +92,9 @@ function addBubble(text, role) {
   chat.appendChild(row);
   chat.scrollTop = chat.scrollHeight;
 }
+
+// 恢复历史消息
+chatHistory.forEach(m => addBubble(m.text, m.role, false));
 
 function addLoading() {
   const row = document.createElement('div');
@@ -96,6 +110,13 @@ function removeLoading() {
   if (el) el.remove();
 }
 
+function clearChat() {
+  chatHistory = [];
+  localStorage.removeItem(STORAGE_KEY);
+  chat.innerHTML = '';
+  fetch('/chat/' + USER_ID + '/clear', {method:'POST'}).catch(function(){});
+}
+
 async function send(msg) {
   if (!msg) msg = input.value.trim();
   if (!msg) return;
@@ -103,12 +124,12 @@ async function send(msg) {
   addBubble(msg, 'user');
   addLoading();
   try {
-    const resp = await fetch('/chat', {
+    var resp = await fetch('/chat', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({user_id: USER_ID, message: msg}),
     });
-    const data = await resp.json();
+    var data = await resp.json();
     removeLoading();
     addBubble(data.reply, 'agent');
   } catch(e) {
@@ -119,7 +140,7 @@ async function send(msg) {
 
 function quickSend(msg) { send(msg); }
 
-input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+input.addEventListener('keydown', function(e) { if (e.key === 'Enter') send(); });
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/static/sw.js');
