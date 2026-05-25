@@ -54,14 +54,15 @@ header .clear-btn{position:absolute;right:14px;background:rgba(255,255,255,.2);b
 <!-- 草莓 -->
 <svg class="fruit fruit-6" viewBox="0 0 100 100"><path d="M50 85 Q20 60 30 30 Q40 15 50 20 Q60 15 70 30 Q80 60 50 85Z" fill="#e53935"/><circle cx="40" cy="38" r="2" fill="#ffcdd2"/><circle cx="52" cy="45" r="2" fill="#ffcdd2"/><circle cx="44" cy="55" r="2" fill="#ffcdd2"/><path d="M47 20 Q50 6 53 20" fill="#4caf50"/><path d="M44 22 Q50 12 56 22Z" fill="#66bb6a"/></svg>
 <header>☕ 蜜雪宣城<button class="clear-btn" onclick="clearChat()" title="清空记录">↺</button></header>
-<div id="chat"></div>
-<div class="quick-replies" id="quick-replies">
-  <button onclick="quickSend('🧊 推荐一杯冰咖啡')">🧊 冰美式</button>
-  <button onclick="quickSend('☕ 想喝热的拿铁')">☕ 热拿铁</button>
-  <button onclick="quickSend('🍵 来杯清爽的果茶')">🍵 清爽果茶</button>
-  <button onclick="quickSend('🥤 奶茶推荐一下')">🥤 奶茶</button>
-  <button onclick="quickSend('🍧 来一杯冰沙')">🍧 沙冰</button>
-  <button onclick="quickSend('🥬 想喝果蔬茶')">🥬 果蔬茶</button>
+<div id="chat">
+  <div class="quick-replies" id="quick-replies">
+    <button onclick="quickSend('🧊 推荐一杯冰咖啡')">🧊 冰美式</button>
+    <button onclick="quickSend('☕ 想喝热的拿铁')">☕ 热拿铁</button>
+    <button onclick="quickSend('🍵 来杯清爽的果茶')">🍵 清爽果茶</button>
+    <button onclick="quickSend('🥤 奶茶推荐一下')">🥤 奶茶</button>
+    <button onclick="quickSend('🍧 来一杯冰沙')">🍧 沙冰</button>
+    <button onclick="quickSend('🥬 想喝果蔬茶')">🥬 果蔬茶</button>
+  </div>
 </div>
 <div id="input-bar">
   <input id="msg" type="text" placeholder="说说你想喝什么..." autocomplete="off">
@@ -114,6 +115,12 @@ function clearChat() {
   chatHistory = [];
   localStorage.removeItem(STORAGE_KEY);
   chat.innerHTML = '';
+  // 恢复快捷按钮
+  var qr = document.createElement('div');
+  qr.className = 'quick-replies';
+  qr.id = 'quick-replies';
+  qr.innerHTML = '<button onclick="quickSend(\'🧊 推荐一杯冰咖啡\')">🧊 冰美式</button><button onclick="quickSend(\'☕ 想喝热的拿铁\')">☕ 热拿铁</button><button onclick="quickSend(\'🍵 来杯清爽的果茶\')">🍵 清爽果茶</button><button onclick="quickSend(\'🥤 奶茶推荐一下\')">🥤 奶茶</button><button onclick="quickSend(\'🍧 来一杯冰沙\')">🍧 沙冰</button><button onclick="quickSend(\'🥬 想喝果蔬茶\')">🥬 果蔬茶</button>';
+  chat.appendChild(qr);
   fetch('/chat/' + USER_ID + '/clear', {method:'POST'}).catch(function(){});
 }
 
@@ -138,7 +145,7 @@ async function send(msg) {
   }
 }
 
-function quickSend(msg) { send(msg); }
+function quickSend(msg) { var qr=document.getElementById('quick-replies'); if(qr) qr.remove(); send(msg); }
 
 input.addEventListener('keydown', function(e) { if (e.key === 'Enter') send(); });
 
