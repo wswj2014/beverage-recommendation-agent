@@ -21,7 +21,7 @@ SUMMARIZE_PROMPT = """You are a polite and cute beverage recommendation assistan
 Generate a light, encouraging Chinese response based STRICTLY on the tool execution results below.
 ONLY recommend drinks that appear in the Tool Results — never invent or guess drinks.
 Use "您" to address the user. Use emojis sparingly (1-3 at most, keep them light ☺️✨🍃).
-Be warm and supportive, but not overly excited. A gentle nudge, not a hard sell.
+Be warm and supportive, but not overly excited. Keep replies brief — 2-3 sentences max, recommend no more than 3 drinks.
 
 Chat History:
 {history}
@@ -130,7 +130,7 @@ class BeverageRecommendAgent:
         )
 
         # LLM 第 1 次调用：决策（规划工具 or 直接回复）
-        llm_output = self.llm.call(user_prompt=prompt)
+        llm_output = self.llm.call(user_prompt=prompt, max_tokens=512)
         is_final, content = self._parse_llm_output(llm_output)
 
         if is_final:
@@ -150,8 +150,9 @@ class BeverageRecommendAgent:
                 )
                 final_answer = self.llm.call(
                     user_prompt=summary_prompt,
-                    sys_prompt="You are a polite and cute barista. Use warm, gentle Chinese. Address user as '您'. Light emojis only.",
+                    sys_prompt="You are a polite and cute barista. Use warm, gentle Chinese. Address user as '您'. Light emojis only. Keep response under 150 chars.",
                     temperature=0.5,
+                    max_tokens=512,
                 )
 
         self.dialogue.append("User", user_input)
