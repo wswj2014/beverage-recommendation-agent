@@ -75,14 +75,14 @@ class BeverageRecommendAgent:
         self.sys_prompt_template = build_system_prompt("", "")
 
     def _init_buffer(self):
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         rows = conn.execute("SELECT id FROM beverages").fetchall()
         all_ids = [r[0] for r in rows]
         conn.close()
         self.buffer.init_all(all_ids)
 
     def _get_table_info(self) -> str:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         cursor = conn.execute("PRAGMA table_info(beverages)")
         cols = [f"{r[1]} ({r[2]})" for r in cursor.fetchall()]
         conn.close()

@@ -16,7 +16,7 @@ class LookUpTool:
     @property
     def conn(self):
         if self._conn is None:
-            self._conn = sqlite3.connect(DB_PATH)
+            self._conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         return self._conn
 
     def run(self, query: str) -> str:
