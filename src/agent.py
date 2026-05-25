@@ -102,6 +102,11 @@ class BeverageRecommendAgent:
         if match:
             return False, match.group(2).strip()
 
+        # If output contains planning keywords but regex didn't match,
+        # it's a malformed plan — treat as error, not final answer
+        if "Question:" in output and ("Action:" in output or "Action Input:" in output):
+            return True, "抱歉，我有点迷糊了，能再说一遍吗？☺️"
+
         # fallback: treat entire output as final answer
         return True, output
 

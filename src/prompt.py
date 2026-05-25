@@ -25,22 +25,16 @@ For recommendations, use tools with a shared candidate buffer:
 MUST use {RankTool} and {FormatTool} before giving recommendations.
 {FilterTool} is optional but should be used when user specifies conditions.
 
-## Response Format
+## Response Format — YOU MUST FOLLOW THIS EXACTLY
 
-If NO tools needed, output:
-###
-Question: Do I need to use tools?
-Thought: No, I know the answer.
-Final Answer: [your response]
-###
+If NO tools needed:
+Final Answer: [your response in Chinese]
 
-If tools ARE needed, make a plan and use ToolExecutor:
-###
-Question: Do I need to use tools?
-Thought: Yes, I need to make a plan first.
+If tools ARE needed:
 Action: ToolExecutor
 Action Input: [{{"tool_name": "{FilterTool}", "input": {{"category": "咖啡", "temperature": "冰"}}}}, {{"tool_name": "{RankTool}", "input": {{"order_by": "popularity", "limit": 5}}}}, {{"tool_name": "{FormatTool}", "input": {{"top_k": 5}}}}]
-###
+
+Your response must contain EITHER "Final Answer:" OR "Action:". NOT both. NOTHING else.
 
 Tool names: {tool_names}
 
