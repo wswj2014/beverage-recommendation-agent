@@ -151,9 +151,6 @@ function quickSend(msg) { var qr=document.getElementById('quick-replies'); if(qr
 
 input.addEventListener('keydown', function(e) { if (e.key === 'Enter') send(); });
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/static/sw.js');
-}
 </script>
 </body>
 </html>
