@@ -91,23 +91,24 @@ class BeverageRecommendAgent:
     def _parse_llm_output(self, output: str) -> Tuple[bool, str]:
         """Returns (is_final_answer, content)"""
         output = output.strip()
+
+        # If output has both Action and Final Answer, split — take Final Answer
+        if "Final Answer:" in output and "Action:" in output:
+            # Try to extract the Action Input first, then return it
+            ai_match = re.search(r"Action\s*Input\s*:\s*(.*)", output, re.DOTALL)
+            if ai_match:
+                return False, ai_match.group(1).strip()
+            return True, output.split("Final Answer:")[-1].strip()
+
         if "Final Answer:" in output:
             return True, output.split("Final Answer:")[-1].strip()
 
-        # try Action/Action Input pattern
-        match = re.search(
-            r"Action\s*\d*\s*:\s*(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:\s*[\s]*(.*)",
-            output, re.DOTALL,
-        )
-        if match:
-            return False, match.group(2).strip()
+        # try Action Input pattern (more flexible)
+        ai_match = re.search(r"Action\s*Input\s*:\s*(.+)$", output, re.DOTALL)
+        if ai_match:
+            return False, ai_match.group(1).strip()
 
-        # If output contains planning keywords but regex didn't match,
-        # it's a malformed plan — treat as error, not final answer
-        if "Question:" in output and ("Action:" in output or "Action Input:" in output):
-            return True, "抱歉，我有点迷糊了，能再说一遍吗？☺️"
-
-        # fallback: treat entire output as final answer
+        # fallback
         return True, output
 
     def run(self, user_input: str) -> str:

@@ -20,6 +20,14 @@ class LookUpTool:
         return self._conn
 
     def run(self, query: str) -> str:
+        # If input looks like JSON, try to extract name/keyword field
+        if query.startswith("{"):
+            try:
+                import json as _json
+                obj = _json.loads(query)
+                query = obj.get("name") or obj.get("keyword") or query
+            except Exception:
+                pass
         # Split query into words and search each independently
         words = [w for w in query.strip().split() if len(w) > 0]
         if not words:
