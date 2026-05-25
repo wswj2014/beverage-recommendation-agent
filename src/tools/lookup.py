@@ -20,17 +20,28 @@ class LookUpTool:
         return self._conn
 
     def run(self, query: str) -> str:
-        keyword = query.strip()
+        # Split query into words and search each independently
+        words = [w for w in query.strip().split() if len(w) > 0]
+        if not words:
+            words = [query.strip()]
+        # Search each word as an OR condition across name/category/tags
+        clauses = ["name LIKE ? OR category LIKE ? OR tags LIKE ?"] * len(words)
+        params = []
+        for w in words:
+            params.extend([f"%{w}%", f"%{w}%", f"%{w}%"])
         rows = self.conn.execute(
-            "SELECT name, category, temperature, sweetness, price, tags, description "
-            "FROM beverages WHERE name LIKE ? OR category LIKE ? OR tags LIKE ? LIMIT 10",
-            (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"),
+            f"SELECT name, category, temperature, sweetness, price, tags, description "
+            f"FROM beverages WHERE {' OR '.join(clauses)} LIMIT 10",
+            params,
         ).fetchall()
         if not rows:
-            return f"未找到与 '{keyword}' 相关的饮品。"
+            return f"未找到与 '{query}' 相关的饮品。"
+        seen = set()
         lines = []
         for r in rows:
             name, cat, temp, sweet, price, tags_str, desc = r
+            if name in seen: continue
+            seen.add(name)
             tags = json.loads(tags_str)
-            lines.append(f"【{name}】{cat} | {temp} | {sweet} | ¥{price} | {'，'.join(tags)} | {desc}")
+            lines.append(f"【{r[0]}】{cat} | {temp} | {sweet} | ¥{price} | {'，'.join(tags)} | {desc}")
         return "\n".join(lines)
