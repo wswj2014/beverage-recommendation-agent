@@ -15,7 +15,7 @@ You have these tools:
 All tools operate on a SQLite beverage table:
 {table_info}
 
-Available categories: 咖啡, 奶茶, 果茶, 纯茶, 冰沙, 果蔬茶. When user mentions any of these (or similar terms like 沙冰 for 冰沙), search the category first.
+Available categories: 咖啡, 奶茶, 果茶, 纯茶, 沙冰, 果蔬茶. When user mentions any of these (or similar terms), search the category first.
 
 For recommendations, use tools with a shared candidate buffer:
 1. Buffer starts with ALL drinks
