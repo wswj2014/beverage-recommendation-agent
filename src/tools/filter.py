@@ -7,6 +7,18 @@ from config import DB_PATH
 from src.buffer import CandidateBuffer
 
 
+def _like_both_orders(column, term, where, params):
+    """Add LIKE conditions for both the term and its character-reversed version.
+    This handles transposed characters like 沙冰/冰沙. """
+    reversed_term = term[::-1]
+    if reversed_term == term:
+        where.append(f"{column} LIKE ?")
+        params.append(f"%{term}%")
+    else:
+        where.append(f"({column} LIKE ? OR {column} LIKE ?)")
+        params.extend([f"%{term}%", f"%{reversed_term}%"])
+
+
 class FilterTool:
     name = "Filter"
     desc = (
@@ -30,11 +42,9 @@ class FilterTool:
         params = []
 
         if "name" in conditions:
-            where.append("name LIKE ?")
-            params.append(f"%{conditions['name']}%")
+            _like_both_orders("name", conditions["name"], where, params)
         if "category" in conditions:
-            where.append("category LIKE ?")
-            params.append(f"%{conditions['category']}%")
+            _like_both_orders("category", conditions["category"], where, params)
         if "temperature" in conditions:
             temp = conditions["temperature"]
             where.append("(temperature = ? OR temperature LIKE ?)")
@@ -49,8 +59,7 @@ class FilterTool:
             where.append("price <= ?")
             params.append(conditions["price_max"])
         if "tags" in conditions:
-            where.append("tags LIKE ?")
-            params.append(f"%{conditions['tags']}%")
+            _like_both_orders("tags", conditions["tags"], where, params)
 
         current_ids = self.buffer.get()
         if not current_ids:
