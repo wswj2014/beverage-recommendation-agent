@@ -135,13 +135,26 @@ class BeverageRecommendAgent:
             **self._tool_name_map,
         )
 
-        # LLM 第 1 次调用：决策（规划工具 or 直接回复），空回复重试2次
+        # LLM 第 1 次调用：决策（规划工具 or 直接回复），空回复重试最多3次
         llm_output = self.llm.call(user_prompt=prompt, max_tokens=512)
-        for _ in range(2):
+        for _ in range(3):
             if llm_output and llm_output.strip():
                 break
             llm_output = self.llm.call(user_prompt=prompt, max_tokens=512)
-        is_final, content = self._parse_llm_output(llm_output)
+
+        # 兜底：LLM 一直空回，直接用关键词生成工具计划
+        if not llm_output or not llm_output.strip():
+            keyword = user_input
+            # Remove common prefixes
+            for prefix in ["推荐", "来一杯", "想喝", "我想要", "给我"]:
+                if keyword.startswith(prefix):
+                    keyword = keyword[len(prefix):]
+                    break
+            # Fallback plan: Filter by keyword then Format
+            fallback_plan = '[{"tool_name": "LookUp", "input": "' + keyword.strip() + '"}, {"tool_name": "Format", "input": {"top_k": 5}}]'
+            is_final, content = False, fallback_plan
+        else:
+            is_final, content = self._parse_llm_output(llm_output)
 
         if is_final:
             final_answer = content
